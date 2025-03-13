@@ -1,0 +1,64 @@
+---
+title: "Final Project"
+author: "Jenny"
+date: "2025-03-11"
+output: html_document
+---
+
+# 
+
+```{r}
+snowfall <- read.csv("Petoskey_snowfall_data.csv")
+head(snowfall)
+```
+
+## 
+
+```{r}
+# Define a function to check if a package is installed, if not install it
+install_if_missing <- function(package) {
+  if (!requireNamespace(package, quietly = TRUE)) {
+    install.packages(package)
+  }
+}
+
+# Create a list of essential packages to ensure they are installed
+packages <- c("dygraphs", "forecast", "lubridate", "plotly", "xts")
+
+# Apply the function to each package to install any missing ones
+lapply(packages, install_if_missing)
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(plotly)
+library(dygraphs)
+library(forecast)
+
+data_path <- "https://websites.umich.edu/~zhukai/env-data-sci"
+```
+
+```{r}
+# Load and process the Fordham pollen data
+fordham_pollen <- file.path(data_path, "pollen", "fordham_pollen_index.csv") |>
+  read_csv(col_types = cols(
+    Date = col_character(), # Read initially as character
+    Lincoln = col_double(),
+    Louis = col_double()
+  )) |>
+  mutate(Date = mdy(Date)) # Convert MM/DD/YY to Date format
+
+# Extract Lincoln Center data
+lincoln_pollen <- fordham_pollen |>
+  select(date = Date, pollen_index = Lincoln) |>
+  drop_na()
+```
+
+```{r}
+# Scatter plot to visualize individual time series data
+ggplot(lincoln_pollen, aes(x = date, y = pollen_index)) +
+  geom_point(size = 0.5) + # Represent each day's pollen count with a point
+  theme_minimal() + # Clean, minimal theme for simplicity
+  labs(x = "Date", y = "Pollen count index") # Label the axes
+```
